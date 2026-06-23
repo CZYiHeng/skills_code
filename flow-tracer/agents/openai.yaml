@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flow-Tracer"
+  short_description: "Sequence diagram + log trace + impact analysis"
+  default_prompt: "Read function headers/docstrings and logs to produce module overview, sequence diagrams, log trace tables, field ownership, and impact analysis."

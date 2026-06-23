@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dev-Flow"
+  short_description: "Analyze, design, code, log in function headers"
+  default_prompt: "Use $dev-flow to orchestrate create/modify work and put business, architecture, contract, dependency, side-effect, error, and logging intent into each function header."

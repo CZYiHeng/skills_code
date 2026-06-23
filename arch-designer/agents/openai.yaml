@@ -1,0 +1,4 @@
+interface:
+  display_name: "Arch-Designer"
+  short_description: "Phase 2: design functions with DAG dependencies"
+  default_prompt: "Read the confirmed temporary @business context. Design functions with owns_fields and depends_on, then hand off details for function headers/docstrings."

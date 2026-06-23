@@ -1,0 +1,4 @@
+interface:
+  display_name: "Func-Logger"
+  short_description: "Phase 4: structured logs with severity levels"
+  default_prompt: "Read function headers and add logs: INFO for IN/OUT/key MAP, DEBUG for batch MAP, WARNING/ERROR for errors. Update each LOG header section."
