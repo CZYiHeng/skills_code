@@ -176,6 +176,12 @@ Add structured logs with level-appropriate severity. Logging intent must also be
 
 Log format: `业务动作名 | 阶段 | key=value`
 
+### Post-Step: Header Consistency Self-Check
+
+After logging is added, run the 7-rule consistency check defined in `flow-tracer` Section -1 on every generated function. Any STALE or MISSING issue must be fixed before declaring the task complete — a freshly written header that already disagrees with its body is a bug, not a drift.
+
+The 7 rules: `OWNS_FIELDS_MATCH`, `DEPENDS_ON_MATCH`, `SIDE_MATCH`, `IN_MATCH`, `OUT_MATCH`, `LOG_MATCH`, `ERRORS_MATCH`. See `flow-tracer/SKILL.md` Section -1 for the full definition.
+
 ---
 
 # MODIFY MODE
@@ -227,12 +233,22 @@ If legacy top-level `@business` / `@architecture` blocks exist, migrate only the
 
 ## Phase 4: Final Verification
 
-Before finishing:
+Before finishing, run the 7-rule Header Consistency Check defined in `flow-tracer` Section -1 on every changed function:
 
-- Re-read changed headers and bodies for consistency.
+| Rule | Check |
+|---|---|
+| `OWNS_FIELDS_MATCH` | body-operated fields vs declared `OWNS_FIELDS` |
+| `DEPENDS_ON_MATCH` | body-called functions vs declared `DEPENDS_ON` |
+| `SIDE_MATCH` | body side effects vs declared `SIDE` |
+| `IN_MATCH` | signature params vs declared `IN` |
+| `OUT_MATCH` | actual returns vs declared `OUT` |
+| `LOG_MATCH` | log statements vs declared `LOG` |
+| `ERRORS_MATCH` | `try/except/raise` vs declared `ERRORS` |
+
+Any STALE or MISSING result must be resolved before the task is declared complete — either update the header to match the new implementation, or revert the implementation if it drifted from the confirmed design. Then:
+
 - Confirm every changed field has exactly one owning function.
-- Confirm each `DEPENDS_ON` entry names an actual function.
-- Confirm logs match the `LOG` section and do not expose secrets.
+- Confirm logs do not expose secrets.
 - Run relevant tests/checks when available.
 
 ---

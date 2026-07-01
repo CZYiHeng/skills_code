@@ -38,6 +38,49 @@ Scan code for:
 
 Always output in this order.
 
+### Section -1: Header Consistency Check
+
+Before any analysis, verify that each function's header/docstring matches its actual implementation. This is the guard against "header is the only source of truth" silently becoming "header is the only lie".
+
+Scan each function with a structured header and check these 7 rules:
+
+| # | Rule | What it checks | STALE (header over-declares) | MISSING (header under-declares) |
+|---|---|---|---|---|
+| 1 | `OWNS_FIELDS_MATCH` | fields created/modified/persisted in body vs `OWNS_FIELDS` | declared field not operated in body | body operates a field not declared |
+| 2 | `DEPENDS_ON_MATCH` | functions called in body vs `DEPENDS_ON` | declared dependency not called | body calls a structured function not declared |
+| 3 | `SIDE_MATCH` | side effects in body vs `SIDE` | declared side effect not executed | body has DB/file/API write but `SIDE: None` |
+| 4 | `IN_MATCH` | function signature parameters vs `IN` description | described param not in signature | signature param not described |
+| 5 | `OUT_MATCH` | actual `return` statements vs `OUT` declared type | declared return shape never returned | returns a shape not declared |
+| 6 | `LOG_MATCH` | actual log statements vs `LOG` section | described log behavior has no corresponding statement | log statement exists but not described in `LOG` |
+| 7 | `ERRORS_MATCH` | `try/except/raise` in body vs `ERRORS` | described exception has no corresponding code | body raises/handles an exception not described |
+
+Output format:
+
+```
+HEADER CONSISTENCY CHECK
+═════════════════════════
+
+| 函数 | 检查项 | 状态 | 详情 |
+|---|---|---|---|
+| `read_file` | OWNS_FIELDS | ✅ OK | 声明 [] 与实现一致 |
+| `read_file` | DEPENDS_ON | ✅ OK | 无依赖 |
+| `clean` | OWNS_FIELDS | ⚠️ STALE | 声明 [result] 但代码中操作的是 df |
+| `filter_rows` | DEPENDS_ON | ❌ MISSING | 调用了 read_file 但未声明依赖 |
+
+SUMMARY: N checked, X OK, Y STALE, Z MISSING
+```
+
+Status values:
+- `✅ OK` — header and implementation agree.
+- `⚠️ STALE` — header declares something the code no longer does. Header is behind reality; update or remove the declaration.
+- `❌ MISSING` — code does something the header never declared. Header is behind reality; add the declaration.
+
+Rules:
+- Only check functions that carry a structured header. Skip plain functions without `ROLE`/`DEPENDS_ON`/etc.
+- A function with zero issues still appears with all 7 rows marked `✅ OK` so the report is auditable end-to-end.
+- If STALE or MISSING is found, the downstream sections (Module Overview, Sequence Diagrams, Impact Analysis) must note which headers are unreliable before trusting them.
+- When a header is fully missing (no structured header at all), mark the function as `❌ NO_HEADER` and skip its 7 checks.
+
 ### Section 0: Module Overview
 
 A markdown table summarizing each module's role, key entry points, core fields, and side effects.
@@ -114,6 +157,7 @@ AFFECTED LOGS:
 
 ## Workflow
 
+0. Run the 7-rule Header Consistency Check (Section -1) before anything else. If STALE or MISSING issues are found, mark those headers as unreliable so downstream sections do not silently trust bad data.
 1. Parse function headers/docstrings first.
 2. Build the `DEPENDS_ON` DAG.
 3. Build field ownership from `OWNS_FIELDS`.
