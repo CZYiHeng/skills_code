@@ -1,55 +1,56 @@
-# WorkBuddy Skill Chains
+# WorkBuddy Skill 集合
 
-> Structured code development and documentation workflow for [WorkBuddy](https://www.codebuddy.cn/) — from requirement analysis to impact tracing, conversational incremental development, plus retrofitting headers onto existing code.
+> 为 [WorkBuddy](https://www.codebuddy.cn/) 打造的结构化代码开发与文档工作流——从需求分析到影响追踪，从对话式渐进开发到给已有代码补结构化头。
 
-## What is this?
+## 这是什么？
 
-Two complementary skill chains plus a standalone conversational skill, all enforcing a **function-header-as-source-of-truth** discipline:
+两条互补的 skill 链 + 一个独立的对话式 skill，都遵循**函数头是架构唯一真实来源**的理念：
 
 ```
-─── dev-flow chain (for NEW code) ───────────────────────────
-dev-flow (master orchestrator — the ONLY entry point)
-  ├─ Phase 1: req-analyst      → requirement analysis, temporary @business
-  ├─ Phase 2: arch-designer    → function decomposition, DAG dependencies
-  ├─ Phase 3: func-contract    → structured function headers + code
-  └─ Phase 4: func-logger      → structured business logging
-flow-tracer (standalone post-hoc analysis tool)
+─── dev-flow 链（写新代码）───────────────────────────────────
+dev-flow（主编排器 — 唯一入口）
+  ├─ Phase 1: req-analyst      → 需求分析，临时 @business
+  ├─ Phase 2: arch-designer    → 函数分解，DAG 依赖
+  ├─ Phase 3: func-contract    → 结构化函数头 + 代码
+  └─ Phase 4: func-logger      → 结构化业务日志
+flow-tracer（独立事后分析工具）
 
-─── code-formatter chain (for EXISTING code) ────────────────
-code-formatter (master orchestrator — the ONLY entry point)
-  ├─ Phase 0: language detect + scope scan + confirm
-  ├─ Phase 1: func-analyzer    → analyze existing code, extract 8-field contract
-  ├─ Phase 2: header-injector  → generate + inject structured headers
-  └─ Phase 3: consistency self-check (7 rules, self-contained)
+─── code-formatter 链（给已有代码补头）──────────────────────
+code-formatter（主编排器 — 唯一入口）
+  ├─ Phase 0: 语言检测 + 范围扫描 + 确认
+  ├─ Phase 1: func-analyzer    → 分析现有代码，提取 8 字段契约
+  ├─ Phase 2: header-injector  → 生成 + 注入结构化头
+  └─ Phase 3: 一致性自检（7 规则，自包含）
 
-─── req-to-code (standalone, conversational) ────────────────
-req-to-code (self-contained — skeleton first, then fill)
-  ├─ Round 1: skeleton (complete 8-field headers + placeholder bodies)
-  ├─ Round 2+: incremental filling based on user feedback
-  ├─ Direction changes: apply immediately, mark rework
-  └─ Final round: full 7-rule consistency check
-  Thinking discipline: thesis-driven (emerges through dialog) + 3 questions per proposal
+─── req-to-code（独立，对话式）──────────────────────────────
+req-to-code（自包含 — 先搭骨架，再逐步填充）
+  ├─ Round 1: 骨架（完整 8 字段头 + 占位符 body）
+  ├─ Round 2+: 根据用户反馈增量填充
+  ├─ 方向变更: 直接应用，标记 rework
+  └─ 最终轮: 全量 7 规则一致性检查
+  思考纪律: 主旨驱动（通过对话渐进涌现）+ 每个方案回答三个问题
 ```
 
-**Core principle:** All durable architecture information lives in function headers/docstrings — not in standalone file-level blocks. The dev-flow chain creates headers alongside new code; the code-formatter chain retrofits headers onto existing code.
+**核心理念：** 所有持久的架构信息都放在函数头/文档字符串里——不是独立的文件级块。dev-flow 链在写新代码时创建头；code-formatter 链给已有代码补头；req-to-code 通过对话渐进式地构建带头的代码。
 
-## Why?
+## 为什么？
 
-- **Docs never drift from code** — the contract is *inside* the function, not in a separate wiki.
-- **Impact analysis is deterministic** — trace any field change through `OWNS_FIELDS` and `DEPENDS_ON`.
-- **Logging is consistent** — every function declares its logging intent in the `LOG` header section.
-- **Works for new code AND modifications** — MODIFY mode reads existing headers, runs impact analysis, then applies changes.
-- **Retrofit existing code** — code-formatter analyzes old code and injects structured headers without modifying logic.
+- **文档不会和代码脱节**——契约在函数*内部*，不在独立的 wiki 里
+- **影响分析是确定性的**——通过 `OWNS_FIELDS` 和 `DEPENDS_ON` 追踪任何字段变更
+- **日志是一致的**——每个函数在 `LOG` 头字段里声明日志意图
+- **新代码和修改都支持**——MODIFY 模式读取已有头，跑影响分析，再应用变更
+- **给老代码补头**——code-formatter 分析旧代码并注入结构化头，不改业务逻辑
+- **对话式渐进构建**——req-to-code 先搭骨架再逐步填充，适合模糊/演进中的需求
 
-## Install
+## 安装
 
-### Option A: Clone directly
+### 方式 A：直接克隆
 
 ```bash
-git clone https://github.com/<your-username>/skills_code.git
+git clone https://github.com/CZYiHeng/skills_code.git
 ```
 
-Then copy each skill folder into your WorkBuddy skills directory:
+然后把每个 skill 文件夹复制到你的 WorkBuddy skills 目录：
 
 ```
 ~/.workbuddy/skills/dev-flow/
@@ -64,80 +65,80 @@ Then copy each skill folder into your WorkBuddy skills directory:
 ~/.workbuddy/skills/req-to-code/
 ```
 
-### Option B: Upload via WorkBuddy UI
+### 方式 B：通过 WorkBuddy UI 上传
 
-Open WorkBuddy → Skills Market → upload each skill folder's `SKILL.md`.
+打开 WorkBuddy → 技能市场 → 上传每个 skill 文件夹的 `SKILL.md`。
 
-## Usage
+## 使用方式
 
-### Start a new coding task
+### 开始一个新的编码任务
 
-Simply describe what you want to build. WorkBuddy will invoke `$dev-flow` automatically:
+直接描述你想构建什么。WorkBuddy 会自动调用 `$dev-flow`：
 
 ```
 > 帮我写一个员工花名册导入功能，输入是 Excel，需要清洗去重后写入数据库
 ```
 
-The orchestrator will:
-1. **req-analyst** — analyze the business context, produce a temporary `@business` block, and **ask you to confirm**.
-2. **arch-designer** — design function decomposition with field ownership and DAG dependencies, and **ask you to confirm**.
-3. **func-contract** — write each function with a structured header + implementation.
-4. **func-logger** — add structured logs matching each function's `LOG` section.
+编排器会：
+1. **req-analyst** — 分析业务上下文，生成临时 `@business` 块，**请你确认**。
+2. **arch-designer** — 设计函数分解、字段归属和 DAG 依赖，**请你确认**。
+3. **func-contract** — 为每个函数写结构化头 + 实现代码。
+4. **func-logger** — 添加匹配每个函数 `LOG` 字段的结构化日志。
 
-### Modify existing code
+### 修改已有代码
 
 ```
 > 把 find_effective_baseline 的 target_date 改成支持日期范围
 ```
 
-If structured function headers are detected, dev-flow switches to **MODIFY mode**:
-1. Reads existing headers.
-2. Runs impact analysis (owner function → downstream consumers → affected logs).
-3. Shows the impact report.
-4. Applies changes and updates all affected headers.
+如果检测到已有结构化函数头，dev-flow 切换到 **MODIFY 模式**：
+1. 读取已有头。
+2. 跑影响分析（归属函数 → 下游消费者 → 受影响的日志）。
+3. 展示影响报告。
+4. 应用变更并更新所有受影响的头。
 
-### Trace data flow & impact
+### 追踪数据流和影响
 
-After code is written, use `flow-tracer` to analyze:
+代码写完后，用 `flow-tracer` 分析：
 
 ```
 > 分析一下余额基线查找的数据流，如果改了 snapshot_date 字段会影响哪些函数？
 ```
 
-Output includes:
-- Module overview table
-- Mermaid sequence diagrams per phase
-- Log trace table with grep commands
-- Field ownership table
-- Impact analysis report
+输出包括：
+- 模块概览表
+- 分阶段 Mermaid 时序图
+- 日志追踪表（含 grep 命令）
+- 字段归属表
+- 影响分析报告
 
-### Format existing code with structured headers
+### 给已有代码补结构化头
 
-When you have existing code without structured headers, use `$code-formatter` to retrofit them:
+当你有已有代码但没有结构化头时，用 `$code-formatter` 补上：
 
 ```
 > 帮我把 data_process.py 的代码格式化成有结构化函数头的
 ```
 
-The orchestrator will:
-1. **Phase 0** — detect language, scan functions, show scope summary, ask for confirmation.
-2. **func-analyzer** — analyze each function's ROLE, DEPENDS_ON, IN, OUT, OWNS_FIELDS, SIDE, ERRORS, LOG.
-3. **header-injector** — generate language-appropriate headers and inject into code.
-4. **Phase 3** — run 7-rule consistency check to ensure headers match implementation.
+编排器会：
+1. **Phase 0** — 检测语言，扫描函数，展示范围摘要，请求确认。
+2. **func-analyzer** — 分析每个函数的 ROLE、DEPENDS_ON、IN、OUT、OWNS_FIELDS、SIDE、ERRORS、LOG。
+3. **header-injector** — 生成语言适配的头并注入代码。
+4. **Phase 3** — 跑 7 规则一致性检查，确保头和实现匹配。
 
-Output: a new file `data_process_formatted.py` with structured headers, original file untouched.
+输出：新文件 `data_process_formatted.py`（带结构化头），原文件不动。
 
-Supports Python, JavaScript/TypeScript, C/C++, Java. Works on single files or entire directories.
+支持 Python、JavaScript/TypeScript、C/C++、Java。可处理单个文件或整个目录。
 
-### Build code iteratively with req-to-code
+### 用 req-to-code 对话式渐进构建
 
-When requirements are fuzzy or evolving, use `$req-to-code` for conversational incremental development:
+当需求模糊或演进中时，用 `$req-to-code` 进行对话式渐进开发：
 
 ```
 > 先搭个骨架，我要做一个 CSV 数据清洗工具，支持去重去空
 ```
 
-Round 1 — the skill writes a minimal runnable skeleton (complete headers + placeholder bodies) and answers three questions (why this way / what's the downside / any conflicts):
+Round 1 — skill 写出最小可运行骨架（完整头 + 占位符 body），并回答三个问题（为什么这样 / 有什么缺点 / 有没有冲突）：
 
 ```
 骨架方案：read_file → clean_data → validate_rows → transform → write_output → main
@@ -151,7 +152,7 @@ ROUND 1 — 骨架
 函数数：6 | 头完整：6 | body 填充：0 | TODO：6
 ```
 
-Round 2+ — say "继续" and the skill fills in bodies upstream-first, runs 7-rule consistency check on changed functions:
+Round 2+ — 说"继续"，skill 按 upstream-first 顺序填充 body，对变更函数跑 7 规则一致性检查：
 
 ```
 > 继续
@@ -160,10 +161,10 @@ ROUND 2 — 填充
 主旨：CSV 数据清洗工具，去重去空
 主旨对齐：✓
 本轮填充：read_file, clean_data
-一致性检查：2 checked, 0 STALE, 0 MISSING
+一致性检查：2 个检查，0 STALE，0 MISSING
 ```
 
-Direction changes are applied immediately — affected functions revert to placeholders with `# TODO(round-N): rework`:
+方向变更是直接应用的——受影响函数回退为占位符，标记 `# TODO(round-N): rework`：
 
 ```
 > 改成支持 JSON 输入
@@ -174,9 +175,9 @@ Direction changes are applied immediately — affected functions revert to place
 有没有冲突：clean_data 和 validate_rows 不受影响
 ```
 
-## Function Header Standard
+## 函数头标准
 
-Every generated or modified function carries a structured header:
+每个生成或修改的函数都带结构化头：
 
 ```python
 def find_effective_baseline(account_id: int, target_date: date) -> SnapshotOut | None:
@@ -208,67 +209,67 @@ def find_effective_baseline(account_id: int, target_date: date) -> SnapshotOut |
     """
 ```
 
-| Field | Purpose |
+| 字段 | 用途 |
 |---|---|
-| `ROLE` | One-line business responsibility |
-| `DEPENDS_ON` | Upstream functions (forms a DAG) |
-| `IN` | Input types and business meaning |
-| `OUT` | Output type and business meaning |
-| `OWNS_FIELDS` | Fields this function creates/normalizes/validates/persists |
-| `SIDE` | Side effects (INSERT/UPDATE/DELETE/external call/file write); `None` if pure |
-| `ERRORS` | Exception, fallback, or `None` return semantics |
-| `LOG` | Logging intent summary |
+| `ROLE` | 一句话业务职责 |
+| `DEPENDS_ON` | 上游函数（构成 DAG） |
+| `IN` | 输入类型和业务含义 |
+| `OUT` | 输出类型和业务含义 |
+| `OWNS_FIELDS` | 此函数创建/标准化/校验/持久化的字段 |
+| `SIDE` | 副作用（INSERT/UPDATE/DELETE/外部调用/文件写入）；无则 `None` |
+| `ERRORS` | 异常、降级或 `None` 返回语义 |
+| `LOG` | 日志意图摘要 |
 
-## Logging Format
+## 日志格式
 
 ```
 业务动作名 | 阶段 | key=value
 ```
 
-| Stage | Level | When |
+| 阶段 | 级别 | 何时使用 |
 |---|---|---|
-| `IN` | INFO | Key inputs for tracing |
-| `OUT` | INFO | Key outputs or result summaries |
-| `MAP` (single) | INFO | Business-critical field mappings |
-| `MAP` (batch) | DEBUG | Bulk mappings, per-row details |
-| `ERR` (recoverable) | WARNING | Fallback, skip, retry |
-| `ERR` (fatal) | ERROR | Operation aborts |
+| `IN` | INFO | 关键输入用于追踪 |
+| `OUT` | INFO | 关键输出或结果摘要 |
+| `MAP`（单条） | INFO | 业务关键字段映射 |
+| `MAP`（批量） | DEBUG | 批量映射、逐行细节 |
+| `ERR`（可恢复） | WARNING | 降级、跳过、重试 |
+| `ERR`（致命） | ERROR | 操作中断 |
 
-## Skill Reference
+## Skill 参考
 
-### Dev-Flow Chain (new code)
+### Dev-Flow 链（新代码）
 
-| Skill | Phase | Invocation | Purpose |
+| Skill | 阶段 | 调用方式 | 用途 |
 |---|---|---|---|
-| `dev-flow` | Orchestrator | `$dev-flow` (auto-triggered on code requests) | Mode detection, pipeline orchestration |
-| `req-analyst` | Phase 1 | Internal only | Business context analysis, `@business` block |
-| `arch-designer` | Phase 2 | Internal only | Function decomposition, DAG, field ownership |
-| `func-contract` | Phase 3 | Internal only | Structured headers + code implementation |
-| `func-logger` | Phase 4 | Internal only | Structured logging + `LOG` header updates |
-| `flow-tracer` | Post-hoc | `$flow-tracer` | Data flow diagrams, log traces, impact analysis |
+| `dev-flow` | 编排器 | `$dev-flow`（代码请求时自动触发） | 模式检测，流水线编排 |
+| `req-analyst` | Phase 1 | 仅内部调用 | 业务上下文分析，`@business` 块 |
+| `arch-designer` | Phase 2 | 仅内部调用 | 函数分解，DAG，字段归属 |
+| `func-contract` | Phase 3 | 仅内部调用 | 结构化头 + 代码实现 |
+| `func-logger` | Phase 4 | 仅内部调用 | 结构化日志 + `LOG` 头更新 |
+| `flow-tracer` | 事后分析 | `$flow-tracer` | 数据流图，日志追踪，影响分析 |
 
-### Code-Formatter Chain (existing code)
+### Code-Formatter 链（已有代码）
 
-| Skill | Phase | Invocation | Purpose |
+| Skill | 阶段 | 调用方式 | 用途 |
 |---|---|---|---|
-| `code-formatter` | Orchestrator | `$code-formatter` | Language detection, scope, pipeline orchestration |
-| `func-analyzer` | Phase 1 | Internal only | Analyze existing functions, extract 8-field contract |
-| `header-injector` | Phase 2 | Internal only | Generate + inject structured headers, output new file |
+| `code-formatter` | 编排器 | `$code-formatter` | 语言检测，范围，流水线编排 |
+| `func-analyzer` | Phase 1 | 仅内部调用 | 分析已有函数，提取 8 字段契约 |
+| `header-injector` | Phase 2 | 仅内部调用 | 生成 + 注入结构化头，输出新文件 |
 
-### Req-To-Code (conversational incremental dev)
+### Req-To-Code（对话式渐进开发）
 
-| Skill | Invocation | Purpose |
+| Skill | 调用方式 | 用途 |
 |---|---|---|
-| `req-to-code` | `$req-to-code` | Conversational incremental development: skeleton first, then fill. Thesis-driven, 3 questions per proposal. Self-contained — no orchestrator, no sub-skills. |
+| `req-to-code` | `$req-to-code` | 对话式渐进开发：先搭骨架，再逐步填充。主旨驱动，每个方案回答三个问题。自包含——无编排器，无子 skill。 |
 
-> Phase skills are designed to be called **only** through their orchestrator. Do not invoke them directly. `req-to-code` is standalone — invoke directly.
+> Phase skill 只能通过编排器调用，不要直接调用。`req-to-code` 是独立的——直接调用。
 
-## Project Structure
+## 项目结构
 
 ```
 skills_code/
 ├── dev-flow/
-│   ├── SKILL.md              # Master orchestrator (new code)
+│   ├── SKILL.md              # 主编排器（新代码）
 │   └── agents/openai.yaml
 ├── req-analyst/
 │   ├── SKILL.md
@@ -286,28 +287,28 @@ skills_code/
 │   ├── SKILL.md
 │   └── agents/openai.yaml
 ├── code-formatter/
-│   ├── SKILL.md              # Master orchestrator (existing code)
+│   ├── SKILL.md              # 主编排器（已有代码）
 │   └── agents/openai.yaml
 ├── func-analyzer/
-│   ├── SKILL.md              # Phase 1: analyze existing code
+│   ├── SKILL.md              # Phase 1: 分析已有代码
 │   └── agents/openai.yaml
 ├── header-injector/
-│   ├── SKILL.md              # Phase 2: inject structured headers
+│   ├── SKILL.md              # Phase 2: 注入结构化头
 │   └── agents/openai.yaml
 ├── req-to-code/
-│   ├── SKILL.md              # Conversational incremental dev (standalone)
+│   ├── SKILL.md              # 对话式渐进开发（独立）
 │   └── agents/openai.yaml
-├── data_process.py           # Example script (standalone CLI tool)
-├── data_process_formatted.py # Example output (code-formatter result)
+├── data_process.py           # 示例脚本（独立 CLI 工具）
+├── data_process_formatted.py # 示例输出（code-formatter 结果）
 └── README.md
 ```
 
-## Example: Full Flow
+## 示例：完整流程
 
-**User request:**
+**用户请求：**
 > 写一个 CSV 数据清洗工具，支持去重、去空、过滤
 
-**Phase 1 — req-analyst output:**
+**Phase 1 — req-analyst 输出：**
 ```
 @business:
   name:       CSV数据清洗
@@ -319,7 +320,7 @@ skills_code/
   complexity: medium
 ```
 
-**Phase 2 — arch-designer output:**
+**Phase 2 — arch-designer 输出：**
 ```
 @architecture:
   functions:
@@ -341,15 +342,15 @@ skills_code/
       ...
 ```
 
-**Phase 3 — func-contract output:** (function headers + implementation)
+**Phase 3 — func-contract 输出：**（函数头 + 实现代码）
 
-**Phase 4 — func-logger output:** (structured logs added to each function)
+**Phase 4 — func-logger 输出：**（为每个函数添加结构化日志）
 
-## Compatibility
+## 兼容性
 
-- **WorkBuddy** (CLI / VS Code extension / WeChat Mini Program)
-- Skills are framework-agnostic — generated code follows the function header standard in any language
+- **WorkBuddy**（CLI / VS Code 插件 / 微信小程序）
+- Skill 与框架无关——生成的代码在任何语言中都遵循函数头标准
 
-## License
+## 许可证
 
 MIT
