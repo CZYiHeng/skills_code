@@ -1,0 +1,4 @@
+interface:
+  display_name: "Req-To-Code"
+  short_description: "对话式渐进开发：先搭骨架，主旨驱动"
+  default_prompt: "使用 $req-to-code 进行对话式渐进开发——Round 1 写出可运行骨架，每个函数带完整的 8 字段头但 body 是占位符；后续轮次根据用户反馈填充 body。每次对话有主旨；每个方案回答三个问题：为什么这样、有什么缺点、有没有冲突。尽量少打断，能推断就推断。"
