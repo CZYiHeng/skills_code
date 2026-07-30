@@ -1,0 +1,4 @@
+interface:
+  display_name: "Func-Analyzer"
+  short_description: "Phase 1: analyze existing functions"
+  default_prompt: "Analyze existing code to extract each function's 8-field contract. Produce a function inventory."

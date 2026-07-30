@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code-Formatter"
+  short_description: "Standardize function headers on existing code"
+  default_prompt: "Use $code-formatter to add structured function headers to existing code for documentation standardization."

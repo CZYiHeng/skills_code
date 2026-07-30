@@ -1,0 +1,4 @@
+interface:
+  display_name: "Header-Injector"
+  short_description: "Phase 2: inject structured headers"
+  default_prompt: "Generate and inject structured headers into code without modifying business logic."
