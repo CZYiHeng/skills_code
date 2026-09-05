@@ -28,7 +28,12 @@ req-to-code（自包含 — 先搭骨架，再逐步填充）
   ├─ Round 2+: 根据用户反馈增量填充
   ├─ 方向变更: 直接应用，标记 rework
   └─ 最终轮: 全量 7 规则一致性检查
-  思考纪律: 主旨驱动（通过对话渐进涌现）+ 每个方案回答三个问题
+  思考纪律: 主旨驱动（通过对话渐进涌现）+ 每个方案做方案评审（已集成 solution-review）
+
+─── 表达层（方案评审与输出速览）────────────────────────────
+solution-review（独立 — 方案三维度：是什么/为什么/优点与对比）
+visual-digest（独立 — 把其他 skill 的输出提炼成图文速览：
+              速览卡 / 流程图 / 对比表 / 进度仪表盘 / HTML 报告页）
 ```
 
 **核心理念：** 所有持久的架构信息都放在函数头/文档字符串里——不是独立的文件级块。dev-flow 链在写新代码时创建头；code-formatter 链给已有代码补头；req-to-code 通过对话渐进式地构建带头的代码。
@@ -63,6 +68,8 @@ git clone https://github.com/CZYiHeng/skills_code.git
 ~/.workbuddy/skills/func-analyzer/
 ~/.workbuddy/skills/header-injector/
 ~/.workbuddy/skills/req-to-code/
+~/.workbuddy/skills/solution-review/
+~/.workbuddy/skills/visual-digest/
 ```
 
 ### 方式 B：通过 WorkBuddy UI 上传
@@ -260,9 +267,16 @@ def find_effective_baseline(account_id: int, target_date: date) -> SnapshotOut |
 
 | Skill | 调用方式 | 用途 |
 |---|---|---|
-| `req-to-code` | `$req-to-code` | 对话式渐进开发：先搭骨架，再逐步填充。主旨驱动，每个方案回答三个问题。自包含——无编排器，无子 skill。 |
+| `req-to-code` | `$req-to-code` | 对话式渐进开发：先搭骨架，再逐步填充。主旨驱动，每个方案做方案评审。自包含——无编排器，无子 skill。 |
 
-> Phase skill 只能通过编排器调用，不要直接调用。`req-to-code` 是独立的——直接调用。
+### 表达层（独立 skill）
+
+| Skill | 调用方式 | 用途 |
+|---|---|---|
+| `solution-review` | `$solution-review` | 方案三维度：是什么/为什么/优点与对比。已集成进 req-to-code 的方案输出环节，也可独立评审任意方案。 |
+| `visual-digest` | `$visual-digest` | 输出速览：把其他 skill 的密集输出提炼成图文（速览卡/流程图/对比表/进度仪表盘/HTML 报告页），一屏看懂。 |
+
+> Phase skill 只能通过编排器调用，不要直接调用。`req-to-code` / `solution-review` / `visual-digest` 是独立的——直接调用。
 
 ## 项目结构
 
@@ -297,6 +311,12 @@ skills_code/
 │   └── agents/openai.yaml
 ├── req-to-code/
 │   ├── SKILL.md              # 对话式渐进开发（独立）
+│   └── agents/openai.yaml
+├── solution-review/
+│   ├── SKILL.md              # 方案三维度评审（独立，已集成进 req-to-code）
+│   └── agents/openai.yaml
+├── visual-digest/
+│   ├── SKILL.md              # 输出速览：图文提炼（独立）
 │   └── agents/openai.yaml
 ├── data_process.py           # 示例脚本（独立 CLI 工具）
 ├── data_process_formatted.py # 示例输出（code-formatter 结果）

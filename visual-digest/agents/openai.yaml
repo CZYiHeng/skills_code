@@ -1,0 +1,8 @@
+interface:
+  display_name: "Visual-Digest"
+  short_description: "输出速览：图文提炼，一屏看懂"
+  default_prompt: >-
+    把指定 skill 的输出提炼成图文速览。先识别输入来源和内容特征，
+    提炼决策所需的最小信息集（结论/决策点/结构/风险/下一步），
+    自动选择形式：速览卡、流程图、对比表、进度仪表盘或 HTML 报告页。
+    只提炼不重新生成内容，末尾附原文位置。
