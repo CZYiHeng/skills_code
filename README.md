@@ -4,22 +4,21 @@
 
 ## 这是什么？
 
-两条互补的 skill 链 + 一个独立的对话式 skill，都遵循**函数头是架构唯一真实来源**的理念：
+两条互补的 skill 链 + 三个独立的开发/表达 skill，都遵循**函数头是架构唯一真实来源**的理念：
 
 ```
 ─── dev-flow 链（写新代码）───────────────────────────────────
-dev-flow（主编排器 — 唯一入口）
-  ├─ Phase 1: req-analyst      → 需求分析，临时 @business
-  ├─ Phase 2: arch-designer    → 函数分解，DAG 依赖
-  ├─ Phase 3: func-contract    → 结构化函数头 + 代码
-  └─ Phase 4: func-logger      → 结构化业务日志
+dev-flow（自包含 — 唯一入口，Phase 1-4 内容全部内联）
+  ├─ CREATE 模式: 需求分析 → 架构设计 → 代码生成 → 日志
+  └─ MODIFY 模式: 理解变更 → 影响分析 → 应用变更 → 最终校验
+flow-tracer（独立事后分析工具）
 flow-tracer（独立事后分析工具）
 
 ─── code-formatter 链（给已有代码补头）──────────────────────
 code-formatter（主编排器 — 唯一入口）
   ├─ Phase 0: 语言检测 + 范围扫描 + 确认
   ├─ Phase 1: func-analyzer    → 分析现有代码，提取 8 字段契约
-  ├─ Phase 2: header-injector  → 生成 + 注入结构化头
+  ├─ Phase 2: header-injector  → 生成 + 注入结构化头（四语言模板权威源）
   └─ Phase 3: 一致性自检（7 规则，自包含）
 
 ─── req-to-code（独立，对话式）──────────────────────────────
@@ -36,7 +35,7 @@ visual-digest（独立 — 把其他 skill 的输出提炼成图文速览：
               速览卡 / 流程图 / 对比表 / 进度仪表盘 / HTML 报告页）
 ```
 
-**核心理念：** 所有持久的架构信息都放在函数头/文档字符串里——不是独立的文件级块。dev-flow 链在写新代码时创建头；code-formatter 链给已有代码补头；req-to-code 通过对话渐进式地构建带头的代码。
+**核心理念：** 所有持久的架构信息都放在函数头/文档字符串里——不是独立的文件级块。dev-flow 自包含地在写新代码时创建头（Phase 1-4 内容全部内联，无独立 phase skill）；code-formatter 链给已有代码补头；req-to-code 通过对话渐进式地构建带头的代码。
 
 ## 为什么？
 
@@ -59,10 +58,6 @@ git clone https://github.com/CZYiHeng/skills_code.git
 
 ```
 ~/.workbuddy/skills/dev-flow/
-~/.workbuddy/skills/req-analyst/
-~/.workbuddy/skills/arch-designer/
-~/.workbuddy/skills/func-contract/
-~/.workbuddy/skills/func-logger/
 ~/.workbuddy/skills/flow-tracer/
 ~/.workbuddy/skills/code-formatter/
 ~/.workbuddy/skills/func-analyzer/
@@ -87,10 +82,10 @@ git clone https://github.com/CZYiHeng/skills_code.git
 ```
 
 编排器会：
-1. **req-analyst** — 分析业务上下文，生成临时 `@business` 块，**请你确认**。
-2. **arch-designer** — 设计函数分解、字段归属和 DAG 依赖，**请你确认**。
-3. **func-contract** — 为每个函数写结构化头 + 实现代码。
-4. **func-logger** — 添加匹配每个函数 `LOG` 字段的结构化日志。
+1. **Phase 1 需求分析** — 评估业务上下文，生成临时 `@business` 块，**请你确认**。
+2. **Phase 2 架构设计** — 设计函数分解、字段归属和 DAG 依赖，**请你确认**（simple 任务跳过）。
+3. **Phase 3 代码生成** — 为每个函数写结构化头 + 实现代码。
+4. **Phase 4 日志** — 添加匹配每个函数 `LOG` 字段的结构化日志。
 
 ### 修改已有代码
 
@@ -239,8 +234,28 @@ def find_effective_baseline(account_id: int, target_date: date) -> SnapshotOut |
 | `OUT` | INFO | 关键输出或结果摘要 |
 | `MAP`（单条） | INFO | 业务关键字段映射 |
 | `MAP`（批量） | DEBUG | 批量映射、逐行细节 |
+| `MAP`（跳过） | INFO | 跳过但会改变输出 |
 | `ERR`（可恢复） | WARNING | 降级、跳过、重试 |
 | `ERR`（致命） | ERROR | 操作中断 |
+
+## SSOT 约定（单一权威源）
+
+WorkBuddy 的 skill 是**整份 SKILL.md 注入上下文**的，跨 skill 引用不会自动解析——未同时加载的 skill，其引用就是死链。所以"抽公共文档、各处引用"这条路在这里走不通。
+
+本仓库的约定是：**必要处保留内联副本，但必须标注权威源**。所有重复定义块都带 `<!-- SSOT: xxx v1 — 权威源 yyy，修改时同步所有副本 -->` 标记，改动权威源时必须同步所有副本。
+
+| 标准 | 权威源 | 副本位置 |
+|---|---|---|
+| 8 字段函数头（四语言模板） | `header-injector` Step 2 | `dev-flow`（Python）、`req-to-code`（Python）、`code-formatter`（指针式引用） |
+| 7 规则一致性检查 | `flow-tracer` Section -1 | `dev-flow`（CREATE Post-Step + MODIFY Phase 4）、`code-formatter` Phase 3、`req-to-code` Round 2 |
+| 日志级别表 | `dev-flow` Phase 4 | `func-analyzer`、`req-to-code`、`README` |
+
+**判定标准已统一**（此前存在漂移，现已对齐）：
+
+- `SIDE_MATCH` / MISSING 包含 **stdout**（`print()` / `console.log()` 算副作用）
+- `DEPENDS_ON_MATCH` / MISSING 只查**结构化**函数
+- 日志表含 `MAP（跳过）→ INFO` 行
+- 状态符号统一：✅ OK / ⚠️ STALE / ❌ MISSING
 
 ## Skill 参考
 
@@ -248,11 +263,7 @@ def find_effective_baseline(account_id: int, target_date: date) -> SnapshotOut |
 
 | Skill | 阶段 | 调用方式 | 用途 |
 |---|---|---|---|
-| `dev-flow` | 编排器 | `$dev-flow`（代码请求时自动触发） | 模式检测，流水线编排 |
-| `req-analyst` | Phase 1 | 仅内部调用 | 业务上下文分析，`@business` 块 |
-| `arch-designer` | Phase 2 | 仅内部调用 | 函数分解，DAG，字段归属 |
-| `func-contract` | Phase 3 | 仅内部调用 | 结构化头 + 代码实现 |
-| `func-logger` | Phase 4 | 仅内部调用 | 结构化日志 + `LOG` 头更新 |
+| `dev-flow` | 自包含编排器 | `$dev-flow`（代码请求时自动触发） | 模式检测，流水线编排，Phase 1-4 内容内联 |
 | `flow-tracer` | 事后分析 | `$flow-tracer` | 数据流图，日志追踪，影响分析 |
 
 ### Code-Formatter 链（已有代码）
@@ -276,7 +287,7 @@ def find_effective_baseline(account_id: int, target_date: date) -> SnapshotOut |
 | `solution-review` | `$solution-review` | 方案三维度：是什么/为什么/优点与对比。已集成进 req-to-code 的方案输出环节，也可独立评审任意方案。 |
 | `visual-digest` | `$visual-digest` | 输出速览：把其他 skill 的密集输出提炼成图文（速览卡/流程图/对比表/进度仪表盘/HTML 报告页），一屏看懂。 |
 
-> Phase skill 只能通过编排器调用，不要直接调用。`req-to-code` / `solution-review` / `visual-digest` 是独立的——直接调用。
+> `func-analyzer` / `header-injector` 只能通过 `$code-formatter` 调用，不要直接调用。`dev-flow` / `req-to-code` / `solution-review` / `visual-digest` 是自包含的——直接调用。
 
 ## 项目结构
 
@@ -284,18 +295,6 @@ def find_effective_baseline(account_id: int, target_date: date) -> SnapshotOut |
 skills_code/
 ├── dev-flow/
 │   ├── SKILL.md              # 主编排器（新代码）
-│   └── agents/openai.yaml
-├── req-analyst/
-│   ├── SKILL.md
-│   └── agents/openai.yaml
-├── arch-designer/
-│   ├── SKILL.md
-│   └── agents/openai.yaml
-├── func-contract/
-│   ├── SKILL.md
-│   └── agents/openai.yaml
-├── func-logger/
-│   ├── SKILL.md
 │   └── agents/openai.yaml
 ├── flow-tracer/
 │   ├── SKILL.md
@@ -328,7 +327,7 @@ skills_code/
 **用户请求：**
 > 写一个 CSV 数据清洗工具，支持去重、去空、过滤
 
-**Phase 1 — req-analyst 输出：**
+**Phase 1 — 需求分析输出：**
 ```
 @business:
   name:       CSV数据清洗
@@ -340,7 +339,7 @@ skills_code/
   complexity: medium
 ```
 
-**Phase 2 — arch-designer 输出：**
+**Phase 2 — 架构设计输出：**
 ```
 @architecture:
   functions:
@@ -362,9 +361,9 @@ skills_code/
       ...
 ```
 
-**Phase 3 — func-contract 输出：**（函数头 + 实现代码）
+**Phase 3 — 代码生成输出：**（函数头 + 实现代码）
 
-**Phase 4 — func-logger 输出：**（为每个函数添加结构化日志）
+**Phase 4 — 日志输出：**（为每个函数添加结构化日志）
 
 ## 兼容性
 

@@ -44,11 +44,13 @@ Before any analysis, verify that each function's header/docstring matches its ac
 
 Scan each function with a structured header and check these 7 rules:
 
-| # | Rule | What it checks | STALE (header over-declares) | MISSING (header under-declares) |
+<!-- SSOT: 7 规则一致性检查 v1 — 本文件 Section -1 是权威源，修改时同步 dev-flow / code-formatter / req-to-code 的副本 -->
+
+| # | Rule | What it checks | STALE（头多声明了） | MISSING（头少声明了） |
 |---|---|---|---|---|
 | 1 | `OWNS_FIELDS_MATCH` | fields created/modified/persisted in body vs `OWNS_FIELDS` | declared field not operated in body | body operates a field not declared |
 | 2 | `DEPENDS_ON_MATCH` | functions called in body vs `DEPENDS_ON` | declared dependency not called | body calls a structured function not declared |
-| 3 | `SIDE_MATCH` | side effects in body vs `SIDE` | declared side effect not executed | body has DB/file/API write but `SIDE: None` |
+| 3 | `SIDE_MATCH` | side effects in body vs `SIDE` | declared side effect not executed | body has DB/file/API/**stdout** write but `SIDE: None` |
 | 4 | `IN_MATCH` | function signature parameters vs `IN` description | described param not in signature | signature param not described |
 | 5 | `OUT_MATCH` | actual `return` statements vs `OUT` declared type | declared return shape never returned | returns a shape not declared |
 | 6 | `LOG_MATCH` | actual log statements vs `LOG` section | described log behavior has no corresponding statement | log statement exists but not described in `LOG` |

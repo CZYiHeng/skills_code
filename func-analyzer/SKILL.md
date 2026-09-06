@@ -175,7 +175,9 @@ Describe the error semantics concisely.
 
 Describe the **recommended** structured logging for this function, based on its ROLE, IN, OUT, SIDE, and ERRORS — even if the code currently only uses `print()` or has no logging at all.
 
-Follow the func-logger severity strategy:
+Follow the logging severity strategy（权威定义在 `dev-flow` Phase 4，原 `func-logger` 已并入其中）:
+
+<!-- SSOT: 日志级别表 v1 — 权威源 dev-flow Phase 4，修改时同步所有副本 -->
 
 | Stage | Level | When |
 |---|---|---|
@@ -183,6 +185,7 @@ Follow the func-logger severity strategy:
 | OUT | INFO | Key outputs or result summaries |
 | MAP (single) | INFO | Business-critical field mappings |
 | MAP (batch) | DEBUG | Bulk mappings, per-row details |
+| MAP skipped | INFO | Skipped work that changes output |
 | ERR (recoverable) | WARNING | Fallback, skip, retry |
 | ERR (fatal) | ERROR | Operation aborts |
 

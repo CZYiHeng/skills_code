@@ -39,6 +39,8 @@ description: >-
 
 ## 函数头标准
 
+<!-- SSOT: 8 字段函数头标准 v1（Python）— 四语言模板权威源 header-injector，修改时同步所有副本 -->
+
 每个函数必须带结构化头/文档字符串。使用语言原生风格：
 
 ### Python
@@ -456,6 +458,7 @@ raw_headers -> cleaned_headers -> header_map
 | OUT | INFO | 关键输出或结果摘要 |
 | MAP 单条 | INFO | 业务关键字段映射 |
 | MAP 批量 | DEBUG | 批量映射、逐行细节 |
+| MAP skipped | INFO | 跳过但会改变输出 |
 | ERR 可恢复 | WARNING | 降级、跳过、重试 |
 | ERR 致命 | ERROR | 操作中断 |
 
@@ -479,11 +482,13 @@ raw_headers -> cleaned_headers -> header_map
 
 对本轮变更的每个函数跑 7 规则检查：
 
+<!-- SSOT: 7 规则一致性检查 v1 — 权威源 flow-tracer Section -1，修改时同步所有副本 -->
+
 | # | 规则 | STALE（头多声明了） | MISSING（头少声明了） |
 |---|---|---|---|
 | 1 | `OWNS_FIELDS_MATCH` | 声明的字段 body 没操作 | body 操作了未声明的字段 |
-| 2 | `DEPENDS_ON_MATCH` | 声明的依赖没调用 | body 调用了未声明的函数 |
-| 3 | `SIDE_MATCH` | 声明的副作用没执行 | body 有写操作但 `SIDE: None` |
+| 2 | `DEPENDS_ON_MATCH` | 声明的依赖没调用 | body 调用了未声明的**结构化**函数 |
+| 3 | `SIDE_MATCH` | 声明的副作用没执行 | body 有 DB/file/API/**stdout** 写操作但 `SIDE: None` |
 | 4 | `IN_MATCH` | 描述的参数不在签名里 | 签名参数没描述 |
 | 5 | `OUT_MATCH` | 声明的返回形状从没返回 | 返回了未声明的形状 |
 | 6 | `LOG_MATCH` | 描述的日志没有对应语句 | 有日志但 `LOG` 没描述 |

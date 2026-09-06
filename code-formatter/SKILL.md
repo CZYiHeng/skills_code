@@ -34,130 +34,10 @@ Core rule: **never modify business logic. Only add or update function header doc
 ## Function Header Standard
 
 Every function must carry a structured header/docstring containing the local contract.
-Use the language-native style:
 
-### Python
+<!-- SSOT: 8 字段函数头标准 v1（四语言模板）— 权威源 header-injector，修改时同步所有副本 -->
 
-```python
-def function_name(...):
-    """
-    ROLE:
-      <one-line business responsibility>
-
-    DEPENDS_ON:
-      [upstream_function_a, upstream_function_b]
-
-    IN:
-      <input types and business meaning>
-
-    OUT:
-      <output type and business meaning>
-
-    OWNS_FIELDS:
-      [field_a, field_b]
-
-    SIDE:
-      <INSERT/UPDATE/DELETE/external call/file write; None if pure>
-
-    ERRORS:
-      <exceptions, fallbacks, or None return semantics; None if no errors>
-
-    LOG:
-      <IN/OUT INFO; key MAP INFO; batch DEBUG; recoverable WARNING; fatal ERROR>
-    """
-```
-
-### JavaScript / TypeScript
-
-```javascript
-function functionName(...) {
-    /**
-     * ROLE:
-     *   <one-line business responsibility>
-     *
-     * DEPENDS_ON:
-     *   [upstreamFunctionA, upstreamFunctionB]
-     *
-     * IN:
-     *   <input types and business meaning>
-     *
-     * OUT:
-     *   <output type and business meaning>
-     *
-     * OWNS_FIELDS:
-     *   [fieldA, fieldB]
-     *
-     * SIDE:
-     *   <INSERT/UPDATE/DELETE/external call/file write; None if pure>
-     *
-     * ERRORS:
-     *   <exceptions, fallbacks, or null/undefined return semantics; None if no errors>
-     *
-     * LOG:
-     *   <IN/OUT INFO; key MAP INFO; batch DEBUG; recoverable WARN; fatal ERROR>
-     */
-```
-
-### C / C++
-
-```c
-/* ROLE:
- *   <one-line business responsibility>
- *
- * DEPENDS_ON:
- *   [upstream_function_a, upstream_function_b]
- *
- * IN:
- *   <input types and business meaning>
- *
- * OUT:
- *   <output type and business meaning>
- *
- * OWNS_FIELDS:
- *   [field_a, field_b]
- *
- * SIDE:
- *   <INSERT/UPDATE/DELETE/external call/file write; None if pure>
- *
- * ERRORS:
- *   <error codes, fallbacks, or NULL return semantics; None if no errors>
- *
- * LOG:
- *   <IN/OUT INFO; key MAP INFO; batch DEBUG; recoverable WARN; fatal ERROR>
- */
-int function_name(...) {
-```
-
-### Java
-
-```java
-/**
- * ROLE:
- *   <one-line business responsibility>
- *
- * DEPENDS_ON:
- *   [upstreamFunctionA, upstreamFunctionB]
- *
- * IN:
- *   <input types and business meaning>
- *
- * OUT:
- *   <output type and business meaning>
- *
- * OWNS_FIELDS:
- *   [fieldA, fieldB]
- *
- * SIDE:
- *   <INSERT/UPDATE/DELETE/external call/file write; None if pure>
- *
- * ERRORS:
- *   <exceptions, fallbacks, or null return semantics; None if no errors>
- *
- * LOG:
- *   <IN/OUT INFO; key MAP INFO; batch DEBUG; recoverable WARN; fatal ERROR>
- */
-public ReturnType functionName(...) {
-```
+四种语言的头模板（Python docstring / JavaScript-TypeScript JSDoc / C-C++ 块注释 / Java Javadoc）**以 `header-injector` 为唯一权威源**。本编排器不复制模板，只负责语言检测与范围确认——Phase 2 注入时按 header-injector 的模板生成。
 
 ## Workflow
 
@@ -254,22 +134,24 @@ Hand off to `header-injector` to generate and inject structured headers:
 After injection, verify that each function's header matches its actual implementation.
 This is self-contained — no external skill dependency required.
 
+<!-- SSOT: 7 规则一致性检查 v1 — 权威源 flow-tracer Section -1，修改时同步所有副本 -->
+
 Check these 7 rules on every formatted function:
 
-| # | Rule | What it checks | STALE (header over-declares) | MISSING (header under-declares) |
+| # | Rule | What it checks | STALE（头多声明了） | MISSING（头少声明了） |
 |---|---|---|---|---|
 | 1 | `OWNS_FIELDS_MATCH` | fields created/modified/persisted in body vs `OWNS_FIELDS` | declared field not operated in body | body operates a field not declared |
-| 2 | `DEPENDS_ON_MATCH` | functions called in body vs `DEPENDS_ON` | declared dependency not called | body calls a function not declared |
-| 3 | `SIDE_MATCH` | side effects in body vs `SIDE` | declared side effect not executed | body has DB/file/API/stdout write but `SIDE: None` |
+| 2 | `DEPENDS_ON_MATCH` | functions called in body vs `DEPENDS_ON` | declared dependency not called | body calls a **structured** function not declared |
+| 3 | `SIDE_MATCH` | side effects in body vs `SIDE` | declared side effect not executed | body has DB/file/API/**stdout** write but `SIDE: None` |
 | 4 | `IN_MATCH` | function signature parameters vs `IN` | described param not in signature | signature param not described |
 | 5 | `OUT_MATCH` | actual `return` statements vs `OUT` | declared return shape never returned | returns a shape not declared |
 | 6 | `LOG_MATCH` | actual log/print statements vs `LOG` | described log behavior has no corresponding statement | log/print exists but not described in `LOG` |
 | 7 | `ERRORS_MATCH` | `try/except/raise` or error returns vs `ERRORS` | described exception has no corresponding code | body raises/handles an exception not described |
 
 Status values:
-- `OK` — header and implementation agree.
-- `STALE` — header declares something the code doesn't do. Fix the header.
-- `MISSING` — code does something the header never declared. Add the declaration.
+- `✅ OK` — header and implementation agree.
+- `⚠️ STALE` — header declares something the code doesn't do. Fix the header.
+- `❌ MISSING` — code does something the header never declared. Add the declaration.
 
 A freshly injected header that already disagrees with its body is a documentation bug.
 Fix all STALE and MISSING issues before delivery.
@@ -282,12 +164,12 @@ CONSISTENCY CHECK
 
 | Function | Rule | Status | Detail |
 |---|---|---|---|
-| read_file | OWNS_FIELDS | OK | [] matches |
-| read_file | DEPENDS_ON | OK | no calls |
-| clean | SIDE | MISSING | has print() but SIDE: None |
+| read_file | OWNS_FIELDS | ✅ OK | [] matches |
+| read_file | DEPENDS_ON | ✅ OK | no calls |
+| clean | SIDE | ❌ MISSING | has print() but SIDE: None |
 | ...
 
-SUMMARY: 12 checked, 10 OK, 1 STALE, 1 MISSING
+SUMMARY: 12 checked, 10 ✅ OK, 1 ⚠️ STALE, 1 ❌ MISSING
 ```
 
 Fix all issues, then deliver the final formatted code.

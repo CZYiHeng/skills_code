@@ -53,6 +53,8 @@ Plus the original source code and the injection mode for each function (INSERT /
 
 ### Step 2: Generate Header Content
 
+<!-- SSOT: 8 字段函数头标准 v1（四语言模板）— 本文件是权威源，修改时同步 dev-flow / req-to-code / README 的副本 -->
+
 For each function in the inventory, generate the 8-field header in the target language format.
 
 #### Python

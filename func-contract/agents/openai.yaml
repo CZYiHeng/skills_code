@@ -1,4 +1,0 @@
-interface:
-  display_name: "Func-Contract"
-  short_description: "Phase 3: write code with header contracts"
-  default_prompt: "Write each function with a structured header/docstring: ROLE, DEPENDS_ON, IN, OUT, OWNS_FIELDS, SIDE, ERRORS, and LOG."

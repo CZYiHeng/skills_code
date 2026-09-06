@@ -1,4 +1,0 @@
-interface:
-  display_name: "Req-Analyst"
-  short_description: "Phase 1: clarify + confirm requirements"
-  default_prompt: "Analyze business context. Ask if unclear. Generate a temporary @business confirmation block with complexity; final code will move durable details into function headers."
